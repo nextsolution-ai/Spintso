@@ -1,5 +1,5 @@
 .vfrc-message--extension-DoneAnimation._1ddzqsn7 {
-  display: none !important;
+    display: none !important;
 }
 
 .vfrc-system-response:has(.vfrc-message--extension-DoneAnimation._1ddzqsn7)
@@ -7,21 +7,16 @@
   display: none;
 }
 
-.vfrc-system-response:has(.vfrc-message--extension-WaitingAnimation._1ddzqsn7)
-  .vfrc-avatar.wfg6590.wfg6591._1ddzqsn2 {
-  display: none;
-}
-
 .vfrc-system-response ._1ddzqsn3 img {
-  width: 150px;
-  height: auto;
-  border: 2px solid #ccc;
-  display: block;
-  margin: 10px 0;
-}
-
+    width: 150px; 
+    height: auto; 
+    border: 2px solid #ccc; 
+    display: block; 
+    margin: 10px 0; 
+  }
+  
 .vfrc-typing-indicator {
-  display: none !important;
+  display: none;
 }
 
 ._17c0nw41 {
