@@ -2089,7 +2089,7 @@ export const WaitingAnimationExtension = {
     await new Promise((resolve) => setTimeout(resolve, 250))
 
     const text = trace.payload?.text || 'Please wait...'
-    const delay = trace.payload?.delay || 3000
+    const delay = trace.payload?.delay || 0
 
     const waitingContainer = document.createElement('div')
     waitingContainer.innerHTML = `
