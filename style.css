@@ -1,3 +1,8 @@
 .vfrc-message--extension-DoneAnimation._1ddzqsn7 {
     display: none !important;
 }
+
+.vfrc-system-response:has(.vfrc-message--extension-DoneAnimation._1ddzqsn7)
+  .vfrc-avatar.wfg6590.wfg6591._1ddzqsn2 {
+  display: none;
+}
