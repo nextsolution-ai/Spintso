@@ -2101,14 +2101,14 @@ export const WaitingAnimationExtension = {
         .waiting-animation-container {
           font-family: Open Sans, sans-serif;
           font-size: 14px;
-          font-weight: 300;
+          font-weight: 500;
           color: #fffc;
           display: flex;
           align-items: center;
         }
         .waiting-text {
           display: inline-block;
-          margin-left: 10px;
+          margin-left: -10px;
         }
         .waiting-letter {
           display: inline-block;
@@ -2119,10 +2119,10 @@ export const WaitingAnimationExtension = {
           50% { color: #000; }
         }
         .spinner {
-          width: 20px;
-          height: 20px;
-          border: 2px solid #fffc;
-          border-top: 2px solid rgb(255, 255, 255);
+          width: 0px;
+          height: 0px;
+          border: 0px solid #fffc;
+          border-top: 0px solid rgb(255, 255, 255);
           border-radius: 50%;
           animation: spin 1s linear infinite;
         }
