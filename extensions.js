@@ -2099,7 +2099,7 @@ export const WaitingAnimationExtension = {
           background: none !important;
         }
         .waiting-animation-container {
-          font-family: Arial, sans-serif;
+          font-family: Open Sans, sans-serif;
           font-size: 14px;
           font-weight: 300;
           color: #fffc;
@@ -2122,7 +2122,7 @@ export const WaitingAnimationExtension = {
           width: 20px;
           height: 20px;
           border: 2px solid #fffc;
-          border-top: 2px solid #CF0A2C;
+          border-top: 2px solid rgb(255, 255, 255);
           border-radius: 50%;
           animation: spin 1s linear infinite;
         }
@@ -2212,5 +2212,91 @@ export const DoneAnimationExtension = {
         element.style.display = "none";
       });
     }
+  },
+};
+
+export const FeedbackSpintsoExtension = {
+  name: "Custom_Feedback",
+  type: "response",
+  match: ({ trace }) =>
+    trace.type === "Custom_Feedback" || trace.payload.name === "Custom_Feedback",
+  render: ({ trace, element }) => {
+    console.log(`Trace from FeedbackExtension: `, trace);
+
+    // Helper function to determine language from URL
+    const getLanguageFromURL = () => {
+      const url = window.location.href;
+      if (url.includes("/de/")) return "de";
+      if (url.includes("/fr/")) return "fr";
+      if (url.includes("/it/")) return "it";
+      if (url.includes("/es/")) return "es";
+      if (url.includes("/sv/")) return "sv";
+      return "en";
+    };
+
+    const feedbackTexts = {
+      en: "Please click how satisfied you are with your help via our virtual assistant.",
+      de: "Bitte klicken Sie, wie zufrieden Sie mit der Hilfe über unseren virtuellen Assistenten sind.",
+      fr: "Veuillez cliquer pour indiquer à quel point vous êtes satisfait de l'aide via notre assistant virtuel.",
+      sv: "Var vänlig klicka på hur nöjd du är med hjälpen via vår virtuella assistent.",
+      es: "Por favor, haga clic en qué tan satisfecho está con la ayuda a través de nuestro asistente virtual.",
+      it: "Per favore, fai clic su quanto sei soddisfatto dell'aiuto tramite il nostro assistente virtuale.",
+    };
+
+    const language = getLanguageFromURL();
+
+    const feedbackContainer = document.createElement("div");
+    feedbackContainer.innerHTML = `
+      <div style="margin: 0 auto;">
+        <!-- Feedback Text -->
+        <div style="text-align: left; font-size: 16px; font-weight: bold; margin-bottom: 10px;">
+          ${feedbackTexts[language]}
+        </div>
+        <!-- Feedback Icons -->
+        <div id="feedback-icons" style="display: flex; justify-content: flex-start; gap: 20px;">
+          <!-- Green Happy Face -->
+          <div class="card green-card" data-value="Green" style="width: 50px; height: 70px; background-color: #32CD32; cursor: pointer; border-radius: 5px; display: flex; align-items: center; justify-content: center;">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10" fill="#32CD32" />
+              <circle cx="8.5" cy="10" r="1.5" fill="black" />
+              <circle cx="15.5" cy="10" r="1.5" fill="black" />
+              <path d="M9 15c1.5 1 4 1 5.5 0" stroke="black" stroke-width="2" />
+            </svg>
+          </div>
+          <!-- Yellow Neutral Face -->
+          <div class="card yellow-card" data-value="Yellow" style="width: 50px; height: 70px; background-color: #FFD700; cursor: pointer; border-radius: 5px; display: flex; align-items: center; justify-content: center;">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10" fill="#FFD700" />
+              <circle cx="8.5" cy="10" r="1.5" fill="black" />
+              <circle cx="15.5" cy="10" r="1.5" fill="black" />
+              <path d="M8.5 15h7" stroke="black" stroke-width="2" />
+            </svg>
+          </div>
+          <!-- Red Sad Face -->
+          <div class="card red-card" data-value="Red" style="width: 50px; height: 70px; background-color: #FF4500; cursor: pointer; border-radius: 5px; display: flex; align-items: center; justify-content: center;">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10" fill="#FF4500" />
+              <circle cx="8.5" cy="10" r="1.5" fill="black" />
+              <circle cx="15.5" cy="10" r="1.5" fill="black" />
+              <path d="M9 16c1.5 -1 4 -1 5.5 0" stroke="black" stroke-width="2" />
+            </svg>
+          </div>
+        </div>
+      </div>
+    `;
+
+    const feedbackIcons = feedbackContainer.querySelectorAll(".card");
+    feedbackIcons.forEach((icon) => {
+      icon.addEventListener("click", function () {
+        const feedbackValue = this.getAttribute("data-value");
+        console.log(`Clicked on ${feedbackValue} card`);
+        window.voiceflow.chat.interact({
+          type: "complete",
+          payload: { feedback: feedbackValue },
+        });
+      });
+    });
+
+    element.appendChild(feedbackContainer);
   },
 };
