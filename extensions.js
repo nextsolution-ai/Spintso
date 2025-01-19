@@ -2190,11 +2190,25 @@ export const DoneAnimationExtension = {
     const shadowRoot = chatDiv?.shadowRoot;
 
     if (shadowRoot) {
-      const targetElements = shadowRoot.querySelectorAll(
-        ".vfrc-system-response:has(.vfrc-message--extension-WaitingAnimation._1ddzqsn7) .vfrc-avatar.wfg6590.wfg6591._1ddzqsn2"
+      const waitingAnimationElements = shadowRoot.querySelectorAll(
+        ".vfrc-system-response:has(.vfrc-message--extension-WaitingAnimation._1ddzqsn7)"
       );
+      waitingAnimationElements.forEach((element) => {
+        element.style.display = "none";
+      });
 
-      targetElements.forEach((element) => {
+      const doneAnimationElements = shadowRoot.querySelectorAll(
+        ".vfrc-system-response:has(.vfrc-message--extension-DoneAnimation._1ddzqsn7)"
+      );
+      doneAnimationElements.forEach((element) => {
+        element.style.display = "none";
+      });
+
+      const avatarElements = shadowRoot.querySelectorAll(
+        ".vfrc-system-response:has(.vfrc-message--extension-WaitingAnimation._1ddzqsn7) .vfrc-avatar.wfg6590.wfg6591._1ddzqsn2, " +
+        ".vfrc-system-response:has(.vfrc-message--extension-DoneAnimation._1ddzqsn7) .vfrc-avatar.wfg6590.wfg6591._1ddzqsn2"
+      );
+      avatarElements.forEach((element) => {
         element.style.display = "none";
       });
     }
