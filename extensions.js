@@ -2182,11 +2182,21 @@ export const DoneAnimationExtension = {
     trace.type === 'ext_doneAnimation' ||
     trace.payload.name === 'ext_doneAnimation',
   render: async ({ trace, element }) => {
-    window.vf_done = true
-    await new Promise((resolve) => setTimeout(resolve, 250))
+    window.vf_done = true;
+    await new Promise((resolve) => setTimeout(resolve, 250));
+    window.voiceflow.chat.interact({ type: 'continue' });
 
-    window.voiceflow.chat.interact({
-      type: 'continue',
-    })
+    const chatDiv = document.getElementById("voiceflow-chat");
+    const shadowRoot = chatDiv?.shadowRoot;
+
+    if (shadowRoot) {
+      const targetElements = shadowRoot.querySelectorAll(
+        ".vfrc-system-response:has(.vfrc-message--extension-WaitingAnimation._1ddzqsn7) .vfrc-avatar.wfg6590.wfg6591._1ddzqsn2"
+      );
+
+      targetElements.forEach((element) => {
+        element.style.display = "none";
+      });
+    }
   },
-}
+};
