@@ -2078,6 +2078,8 @@ export const LanguageDetectionExtension = {
   },
 };
 
+// This extension shows a waiting animation with customizable text and delay
+// Also checking for the vf_done value to stop/hide the animation if it's true
 export const WaitingAnimationExtension = {
   name: 'WaitingAnimation',
   type: 'response',
@@ -2085,13 +2087,13 @@ export const WaitingAnimationExtension = {
     trace.type === 'ext_waitingAnimation' ||
     trace.payload.name === 'ext_waitingAnimation',
   render: async ({ trace, element }) => {
-    window.vf_done = true
-    await new Promise((resolve) => setTimeout(resolve, 250))
+    window.vf_done = true;
+    await new Promise((resolve) => setTimeout(resolve, 250));
 
-    const text = trace.payload?.text || 'Please wait...'
-    const delay = trace.payload?.delay || 0
+    const text = trace.payload?.text || 'Please wait...';
+    const delay = trace.payload?.delay || 3000;
 
-    const waitingContainer = document.createElement('div')
+    const waitingContainer = document.createElement('div');
     waitingContainer.innerHTML = `
       <style>
         .vfrc-message--extension-WaitingAnimation {
@@ -2099,16 +2101,16 @@ export const WaitingAnimationExtension = {
           background: none !important;
         }
         .waiting-animation-container {
-          font-family: Open Sans, sans-serif;
+          font-family: Arial, sans-serif;
           font-size: 14px;
-          font-weight: 500;
+          font-weight: 300;
           color: #fffc;
           display: flex;
           align-items: center;
         }
         .waiting-text {
           display: inline-block;
-          margin-left: -10px;
+          margin-left: 10px;
         }
         .waiting-letter {
           display: inline-block;
@@ -2119,10 +2121,10 @@ export const WaitingAnimationExtension = {
           50% { color: #000; }
         }
         .spinner {
-          width: 0px;
-          height: 0px;
-          border: 0px solid #fffc;
-          border-top: 0px solid rgb(255, 255, 255);
+          width: 20px;
+          height: 20px;
+          border: 2px solid #fffc;
+          border-top: 2px solid #CF0A2C;
           border-radius: 50%;
           animation: spin 1s linear infinite;
         }
@@ -2144,74 +2146,86 @@ export const WaitingAnimationExtension = {
           )
           .join('')}</span>
       </div>
-    `
+    `;
 
-    element.appendChild(waitingContainer)
+    element.appendChild(waitingContainer);
 
+    // Send continue signal to Voiceflow
     window.voiceflow.chat.interact({
       type: 'continue',
-    })
+    });
 
-    let intervalCleared = false
-    window.vf_done = false
+    let intervalCleared = false;
+    window.vf_done = false;
+
+    const removeParentElement = () => {
+      const chatDiv = document.getElementById('voiceflow-chat');
+      const shadowRoot = chatDiv?.shadowRoot;
+
+      // Find the parent container of the WaitingAnimation message
+      const parentElement = shadowRoot?.querySelector(
+        '.vfrc-system-response:has(.vfrc-message--extension-WaitingAnimation._1ddzqsn7)'
+      );
+      if (parentElement) {
+        parentElement.remove(); // Completely remove the parent element
+      }
+    };
 
     const checkDoneInterval = setInterval(() => {
       if (window.vf_done) {
-        clearInterval(checkDoneInterval)
-        waitingContainer.style.display = 'none'
-        window.vf_done = false
+        clearInterval(checkDoneInterval);
+        waitingContainer.style.display = 'none';
+        window.vf_done = false;
+
+        // Remove the parent element when the animation finishes
+        removeParentElement();
       }
-    }, 100)
+    }, 100);
 
     setTimeout(() => {
       if (!intervalCleared) {
-        clearInterval(checkDoneInterval)
-        waitingContainer.style.display = 'none'
+        clearInterval(checkDoneInterval);
+        waitingContainer.style.display = 'none';
+
+        // Remove the parent element after the delay
+        removeParentElement();
       }
-    }, delay)
+    }, delay);
   },
-}
+};
 
 // This extension triggers a "done" action,
 // typically used to signal the completion of a task
 // and hide a previous WaitingAnimation
 export const DoneAnimationExtension = {
   name: 'DoneAnimation',
-  type: 'response',
+  type: 'effect',
   match: ({ trace }) =>
     trace.type === 'ext_doneAnimation' ||
-    trace.payload.name === 'ext_doneAnimation',
-  render: async ({ trace, element }) => {
-    window.vf_done = true;
-    await new Promise((resolve) => setTimeout(resolve, 250));
-    window.voiceflow.chat.interact({ type: 'continue' });
+    trace.payload?.name === 'ext_doneAnimation',
+  run: async () => {
+    // Continue the flow in Voiceflow
+    window.voiceflow.chat.interact({
+      type: 'continue',
+    });
 
-    const chatDiv = document.getElementById("voiceflow-chat");
+    // Set vf_done to true
+    window.vf_done = true;
+
+    // Dynamically hide the WaitingAnimation message
+    const chatDiv = document.getElementById('voiceflow-chat');
     const shadowRoot = chatDiv?.shadowRoot;
 
-    if (shadowRoot) {
-      const waitingAnimationElements = shadowRoot.querySelectorAll(
-        ".vfrc-system-response:has(.vfrc-message--extension-WaitingAnimation._1ddzqsn7)"
-      );
-      waitingAnimationElements.forEach((element) => {
-        element.style.display = "none";
-      });
+    const waitingMessage = shadowRoot?.querySelector(
+      '.vfrc-message.vfrc-message--extension-WaitingAnimation._1ddzqsn7'
+    );
 
-      const doneAnimationElements = shadowRoot.querySelectorAll(
-        ".vfrc-system-response:has(.vfrc-message--extension-DoneAnimation._1ddzqsn7)"
-      );
-      doneAnimationElements.forEach((element) => {
-        element.style.display = "none";
-      });
-
-      const avatarElements = shadowRoot.querySelectorAll(
-        ".vfrc-system-response:has(.vfrc-message--extension-WaitingAnimation._1ddzqsn7) .vfrc-avatar.wfg6590.wfg6591._1ddzqsn2, " +
-        ".vfrc-system-response:has(.vfrc-message--extension-DoneAnimation._1ddzqsn7) .vfrc-avatar.wfg6590.wfg6591._1ddzqsn2"
-      );
-      avatarElements.forEach((element) => {
-        element.style.display = "none";
-      });
+    if (waitingMessage) {
+      waitingMessage.style.display = 'none';
     }
+
+    // Optional delay
+    await new Promise((resolve) => setTimeout(resolve, 250));
   },
 };
 
